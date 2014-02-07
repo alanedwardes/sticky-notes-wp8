@@ -11,10 +11,10 @@ using sticky_notes_wp8.Resources;
 
 namespace sticky_notes_wp8
 {
-    public partial class MainPage : PhoneApplicationPage
+    public partial class Login : PhoneApplicationPage
     {
         // Constructor
-        public MainPage()
+        public Login()
         {
             InitializeComponent();
 
@@ -24,7 +24,7 @@ namespace sticky_notes_wp8
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("/NoteList.xaml", UriKind.Relative));
+            NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
         }
 
         // Sample code for building a localized ApplicationBar

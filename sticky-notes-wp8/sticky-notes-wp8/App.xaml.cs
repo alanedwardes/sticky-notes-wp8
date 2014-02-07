@@ -7,6 +7,7 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using sticky_notes_wp8.Resources;
+using sticky_notes_wp8.Data;
 
 namespace sticky_notes_wp8
 {
@@ -34,6 +35,8 @@ namespace sticky_notes_wp8
 
             // Language display initialization
             InitializeLanguage();
+
+            InitializeDatabase();
 
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
@@ -217,6 +220,16 @@ namespace sticky_notes_wp8
                 }
 
                 throw;
+            }
+        }
+
+        private void InitializeDatabase()
+        {
+            var db = new StickyNotesDataContext(StickyNotesDataContext.DBConnectionString);
+            ServiceLocator.RegisterInstance<StickyNotesDataContext>(db);
+            if (!db.DatabaseExists())
+            {
+                db.CreateDatabase();
             }
         }
     }
