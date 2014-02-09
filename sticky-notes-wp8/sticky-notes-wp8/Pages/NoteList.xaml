@@ -14,11 +14,11 @@
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource SNBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
 
         <!--TitlePanel contains the name of the application and page title-->
@@ -28,53 +28,72 @@
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12">
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12, 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBox
-                FontSize="{StaticResource PhoneFontSizeLarge}"
+                GotFocus="SearchBox_GotFocus"
+                KeyUp="SearchBox_KeyUp"
+                x:Name="SearchBox"
                 TextAlignment="Left"
                 VerticalAlignment="Center"
-                Text="Search notes"
+                Text="Search notes..."
                 Grid.Row="0"/>
             <Button
-                FontSize="{StaticResource PhoneFontSizeLarge}"
-                Content="!"
-                FontFamily="Wingdings"
-                Grid.Column="1" Click="Button_Click"/>
+                x:Name="AddButton"
+                Content="+"
+                VerticalAlignment="Center"
+                Grid.Column="1"
+                Click="AddButton_Click"/>
         </Grid>
 
-        <ListBox ItemsSource="{Binding Notes}" Grid.Row="2">
+        <ListBox HorizontalContentAlignment="Stretch"
+                 HorizontalAlignment="Stretch"
+                 Foreground="Black"
+                 ItemsSource="{Binding Notes}"
+                 Grid.Row="2"
+                 Margin="24, 0, 24, 24">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid HorizontalAlignment="Stretch" Width="440">
-                        <Grid.ColumnDefinitions>
-                            <!--<ColumnDefinition Width="50" />-->
-                            <ColumnDefinition Width="*" />
-                            <!--ColumnDefinition Width="100" />-->
-                        </Grid.ColumnDefinitions>
-                        <!--<CheckBox
-                                IsChecked="{Binding IsComplete, Mode=TwoWay}"
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="5*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="12" Grid.Column="0">
+                                <TextBlock HorizontalAlignment="Center"
+                                    Foreground="White"
+                                    Text="{Binding Path=Created, StringFormat='{}{0:MMM}'}"/>
+                                <TextBlock HorizontalAlignment="Center"
+                                    Foreground="White"
+                                    Text="{Binding Path=Created, StringFormat='{}{0:dd}'}"/>
+                            </StackPanel>
+                            <TextBlock Margin="12" Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Foreground="White"
+                                FontSize="{StaticResource PhoneFontSizeExtraLarge}"
+                                Text="{Binding Path=Created, StringFormat='{}{0:HH:mm}'}"/>
+                        </Grid>
+                        <Border Background="{StaticResource SNNoteBackgroundBrush}">
+                            <TextBlock
+                                Tap="TextBlock_Tap"
+                                Hold="TextBlock_Hold"
                                 Grid.Column="0"
-                                VerticalAlignment="Center"/>-->
-                        <TextBlock
+                                Padding="12"
                                 Text="{Binding Body}"
-                                FontSize="{StaticResource PhoneFontSizeLarge}"
-                                Grid.Column="1"
-                                VerticalAlignment="Center"/>
-                        <!--<Button
-                                Grid.Column="2"
-                                x:Name="deleteTaskButton"
-                                BorderThickness="0"                                
-                                Margin="0"
-                                Click="deleteTaskButton_Click">
-                            <Image Source="appbar.delete.rest.png"/>
-                        </Button>-->
-                    </Grid>
+                                FontSize="{StaticResource PhoneFontSizeLarge}"/>
+                        </Border>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
     </Grid>
 

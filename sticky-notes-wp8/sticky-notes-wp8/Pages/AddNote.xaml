@@ -12,8 +12,9 @@
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="True">
+    
 
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource SNBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -21,7 +22,10 @@
 
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="STICKY NOTES" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock Text="add note" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock x:Name="PageTitle"
+                       Margin="9,-7,0,0"
+                       Text="edit/create"
+                       Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12">
@@ -33,14 +37,16 @@
                 Name="NoteBody"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
-                Text=""
+                KeyDown="NoteBody_KeyDown"
+                Text="{Binding CurrentNote.Body, Mode=TwoWay}"
                 Grid.Row="0"/>
             <Button
+                x:Name="SaveNote"
                 FontSize="{StaticResource PhoneFontSizeLarge}"
                 Content="Save"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
-                Grid.Row="1" Click="Button_Click"/>
+                Grid.Row="1" Click="SaveNote_Click"/>
         </Grid>
     </Grid>
 </phone:PhoneApplicationPage>

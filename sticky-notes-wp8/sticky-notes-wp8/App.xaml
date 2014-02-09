@@ -7,7 +7,12 @@
 
     <!--Application Resources-->
     <Application.Resources>
-        <local:LocalizedStrings xmlns:local="clr-namespace:sticky_notes_wp8" x:Key="LocalizedStrings"/>
+        <!--<local:LocalizedStrings xmlns:local="clr-namespace:sticky_notes_wp8" x:Key="LocalizedStrings"/>-->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/StickyNotesStyles.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

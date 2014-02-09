@@ -39,8 +39,7 @@ namespace sticky_notes_wp8.Data
         private string body;
 
         [Column(DbType = "NVarChar(1024) NOT NULL",
-            CanBeNull = false,
-            AutoSync = AutoSync.OnInsert)]
+            CanBeNull = false)]
         public string Body
         {
             get { return body; }
@@ -51,6 +50,22 @@ namespace sticky_notes_wp8.Data
                     NotifyPropertyChanging("Body");
                     body = value;
                     NotifyPropertyChanged("Body");
+                }
+            }
+        }
+
+        private DateTime created;
+        [Column(DbType = "DATETIME")]
+        public DateTime Created
+        {
+            get { return created; }
+            set
+            {
+                if (created != value)
+                {
+                    NotifyPropertyChanging("Created");
+                    created = value;
+                    NotifyPropertyChanged("Created");
                 }
             }
         }
