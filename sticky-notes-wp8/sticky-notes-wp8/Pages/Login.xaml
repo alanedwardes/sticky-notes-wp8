@@ -50,13 +50,21 @@
                 FontSize="{StaticResource PhoneFontSizeMedium}"
                 Margin="12,4"
                 Text="email address"/>
-            <TextBox Grid.Row="1"/>
+            <TextBox
+                x:Name="username"/>
             <TextBlock
                 FontSize="{StaticResource PhoneFontSizeMedium}"
                 Margin="12,4"
                 Text="password"/>
-            <PasswordBox Grid.Row="2"/>
-            <Button Content="login" Click="Button_Click" />
+            <PasswordBox
+                x:Name="password"/>
+            <Button
+                Content="login"
+                Click="Button_Click" />
+            <ProgressBar
+                x:Name="loginProgress"
+                IsIndeterminate="False"
+                Foreground="{StaticResource PhoneForegroundBrush}" />
         </StackPanel>
 
 

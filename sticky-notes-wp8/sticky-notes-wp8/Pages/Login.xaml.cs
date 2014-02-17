@@ -8,39 +8,43 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using sticky_notes_wp8.Resources;
+using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8
 {
     public partial class Login : PhoneApplicationPage
     {
-        // Constructor
         public Login()
         {
             InitializeComponent();
-
-            // Sample code to localize the ApplicationBar
-            //BuildLocalizedApplicationBar();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
+            var loginButton = sender as Button;
+
+            loginProgress.IsIndeterminate = true;
+            loginButton.IsEnabled = false;
+
+            var onlineRepository = ServiceLocator.GetInstance<OnlineRepository>();
+            var response = await onlineRepository.userLogin(this.username.Text, this.password.Password);
+
+            loginButton.IsEnabled = true;
+            loginProgress.IsIndeterminate = false;
+
+            switch (response.code)
+            {
+                case 403:
+                    MessageBox.Show("Invalid username or password.", "Incorrect Credentials", MessageBoxButton.OK);
+                    break;
+                case 200:
+                    MessageBox.Show("Session token: " + response.data.session.id, "Login Successful", MessageBoxButton.OK);
+                    //NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
+                    break;
+                default:
+                    MessageBox.Show("An error occurred whilst logging in. Please try again.", "Login Error", MessageBoxButton.OK);
+                    break;
+            }
         }
-
-        // Sample code for building a localized ApplicationBar
-        //private void BuildLocalizedApplicationBar()
-        //{
-        //    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-        //    ApplicationBar = new ApplicationBar();
-
-        //    // Create a new button and set the text value to the localized string from AppResources.
-        //    ApplicationBarIconButton appBarButton = new ApplicationBarIconButton(new Uri("/Assets/AppBar/appbar.add.rest.png", UriKind.Relative));
-        //    appBarButton.Text = AppResources.AppBarButtonText;
-        //    ApplicationBar.Buttons.Add(appBarButton);
-
-        //    // Create a new menu item with the localized string from AppResources.
-        //    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.AppBarMenuItemText);
-        //    ApplicationBar.MenuItems.Add(appBarMenuItem);
-        //}
     }
 }

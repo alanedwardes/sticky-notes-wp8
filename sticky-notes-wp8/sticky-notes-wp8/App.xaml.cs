@@ -8,6 +8,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using sticky_notes_wp8.Resources;
 using sticky_notes_wp8.Data;
+using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8
 {
@@ -37,6 +38,8 @@ namespace sticky_notes_wp8
             InitializeLanguage();
 
             InitializeDatabase();
+
+            InitializeOnlineRepository();
 
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
@@ -231,6 +234,12 @@ namespace sticky_notes_wp8
             {
                 db.CreateDatabase();
             }
+        }
+
+        private void InitializeOnlineRepository()
+        {
+            var repo = new OnlineRepository();
+            ServiceLocator.RegisterInstance<OnlineRepository>(repo);
         }
     }
 }
