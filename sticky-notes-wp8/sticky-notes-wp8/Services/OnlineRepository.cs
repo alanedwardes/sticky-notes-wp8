@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.IO;
 using Newtonsoft.Json;
+using sticky_notes_wp8.Data;
 
 namespace sticky_notes_wp8.Services
 {
@@ -18,6 +19,10 @@ namespace sticky_notes_wp8.Services
             {
                 public const string Login = "user/login";
             }
+            public struct Boards
+            {
+                public const string List = "boards/list";
+            }
         }
 
         public class Session
@@ -28,7 +33,7 @@ namespace sticky_notes_wp8.Services
 
         public class User
         {
-            public string id;
+            public int id;
             public string firstName;
             public string surname;
             public string email;
@@ -47,9 +52,14 @@ namespace sticky_notes_wp8.Services
             public T data;
         }
 
+        public class BoardsListResponse : List<Board>
+        {
+
+        }
+
         const string ENDPOINT = "http://stickyapi.alanedwardes.com/";
 
-        public string DictionaryToQueryString(Dictionary<string, string> dictionary)
+        public static string DictionaryToQueryString(Dictionary<string, string> dictionary)
         {
             var stringBuilder = new StringBuilder();
             bool isFirst = true;
@@ -65,7 +75,7 @@ namespace sticky_notes_wp8.Services
             return stringBuilder.ToString();
         }
 
-        public async Task<RepositoryResponse<T>> HttpPostAsync<T>(string apiMethod, Dictionary<string, string> parameters)
+        public static async Task<RepositoryResponse<T>> HttpPostAsync<T>(string apiMethod, Dictionary<string, string> parameters)
         {
             var data = DictionaryToQueryString(parameters);
             var httpClient = new HttpClient();
@@ -74,7 +84,15 @@ namespace sticky_notes_wp8.Services
             // Timeout is 500 milliseconds
             httpClient.Timeout = TimeSpan.FromMilliseconds(500);
 
-            var response = await httpClient.PostAsync(ENDPOINT + apiMethod, stringContent);
+            HttpResponseMessage response;
+            try
+            {
+                response = await httpClient.PostAsync(ENDPOINT + apiMethod, stringContent);
+            }
+            catch (TaskCanceledException)
+            {
+                return new RepositoryResponse<T> { code = (int)HttpStatusCode.RequestTimeout };
+            }
 
             var repositoryResponse = new RepositoryResponse<T> { code = (int)response.StatusCode };
 
@@ -89,10 +107,17 @@ namespace sticky_notes_wp8.Services
 
         public async Task<RepositoryResponse<LoginResponse>> userLogin(string username, string password)
         {
-            var credentials = new Dictionary<string, string>();
-            credentials.Add("username", username);
-            credentials.Add("password", password);
-            return await HttpPostAsync<LoginResponse>(APIMethods.User.Login, credentials);
+            var data = new Dictionary<string, string>();
+            data.Add("username", username);
+            data.Add("password", password);
+            return await HttpPostAsync<LoginResponse>(APIMethods.User.Login, data);
+        }
+
+        public async Task<RepositoryResponse<BoardsListResponse>> boardsList(string token)
+        {
+            var data = new Dictionary<string, string>();
+            data.Add("token", token);
+            return await HttpPostAsync<BoardsListResponse>(APIMethods.Boards.List, data);
         }
     }
 }

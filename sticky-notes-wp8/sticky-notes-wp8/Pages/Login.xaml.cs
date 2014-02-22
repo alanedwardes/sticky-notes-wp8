@@ -14,6 +14,8 @@ namespace sticky_notes_wp8
 {
     public partial class Login : PhoneApplicationPage
     {
+        private string redirectUri;
+
         public Login()
         {
             InitializeComponent();
@@ -32,18 +34,48 @@ namespace sticky_notes_wp8
             loginButton.IsEnabled = true;
             loginProgress.IsIndeterminate = false;
 
-            switch (response.code)
+            ShowMessageBasedOnResponseCode(response.code);
+
+            if (response.code == 200)
+            {
+                SaveUserTokenFromLoginResponse(response);
+            }
+        }
+
+        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            string redirectTo;
+            if (NavigationContext.QueryString.TryGetValue("redirectTo", out redirectTo))
+            {
+                NavigationService.RemoveBackEntry();
+                redirectUri = redirectTo;
+            }
+        }
+
+        private void ShowMessageBasedOnResponseCode(int code)
+        {
+            switch (code)
             {
                 case 403:
                     MessageBox.Show("Invalid username or password.", "Incorrect Credentials", MessageBoxButton.OK);
                     break;
                 case 200:
-                    MessageBox.Show("Session token: " + response.data.session.id, "Login Successful", MessageBoxButton.OK);
-                    //NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
                     break;
                 default:
                     MessageBox.Show("An error occurred whilst logging in. Please try again.", "Login Error", MessageBoxButton.OK);
                     break;
+            }
+        }
+
+        private void SaveUserTokenFromLoginResponse(OnlineRepository.RepositoryResponse<OnlineRepository.LoginResponse> response)
+        {
+            SettingsManager.SaveSetting(SettingsManager.SESSION_TOKEN, response.data.session.id);
+
+            // SettingsManager.GetSetting<string>(SettingsManager.SESSION_TOKEN);
+            if (redirectUri != null)
+            {
+                NavigationService.Navigate(new Uri(redirectUri, UriKind.Relative));
             }
         }
     }

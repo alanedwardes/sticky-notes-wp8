@@ -18,5 +18,6 @@ namespace sticky_notes_wp8.Data
         public StickyNotesDataContext(string connectionString) : base(connectionString) { }
 
         public Table<Note> Notes;
+        public Table<Board> Boards;
     }
 }

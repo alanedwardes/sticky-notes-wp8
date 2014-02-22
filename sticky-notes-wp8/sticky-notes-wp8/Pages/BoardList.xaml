@@ -1,5 +1,5 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="sticky_notes_wp8.NoteList"
+    x:Class="sticky_notes_wp8.BoardList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -11,20 +11,18 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="True"
+    Loaded="PhoneApplicationPage_Loaded">
 
     <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="False">
+        <shell:ApplicationBar
+            IsVisible="True"
+            IsMenuEnabled="False">
             <shell:ApplicationBarIconButton
-                x:Name="AddButton"
-                IconUri="/Assets/AddIcon.png"
-                Click="AddButton_Click"
-                Text="add note"/>
-            <shell:ApplicationBarIconButton
-                x:Name="BoardsButton"
-                IconUri="/Assets/BoardsIcon.png"
-                Click="BoardsButton_Click"
-                Text="Boards"/>
+                x:Name="ReloadButton"
+                IconUri="/Assets/ReloadIcon.png"
+                Click="ReloadButton_Click"
+                Text="reload"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
@@ -39,7 +37,7 @@
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="STICKY NOTES" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock Text="notes" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="boards" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
@@ -50,43 +48,24 @@
             Margin="12,0"
             TextAlignment="Left"
             VerticalAlignment="Center"
-            Text="Search notes..."
+            Text="Search boards..."
             Grid.Row="1"/>
+
         <ListBox HorizontalContentAlignment="Stretch"
                  HorizontalAlignment="Stretch"
                  Foreground="Black"
-                 ItemsSource="{Binding Notes}"
+                 ItemsSource="{Binding Boards}"
                  Grid.Row="2"
                  Margin="24, 0, 24, 24">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"></ColumnDefinition>
-                                <ColumnDefinition Width="5*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Margin="12" Grid.Column="0">
-                                <TextBlock HorizontalAlignment="Center"
-                                    Foreground="White"
-                                    Text="{Binding Path=Created, StringFormat='{}{0:MMM}'}"/>
-                                <TextBlock HorizontalAlignment="Center"
-                                    Foreground="White"
-                                    Text="{Binding Path=Created, StringFormat='{}{0:dd}'}"/>
-                            </StackPanel>
-                            <TextBlock Margin="12" Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Foreground="White"
-                                FontSize="{StaticResource PhoneFontSizeExtraLarge}"
-                                Text="{Binding Path=Created, StringFormat='{}{0:HH:mm}'}"/>
-                        </Grid>
                         <Border Background="{StaticResource SNNoteBackgroundBrush}">
                             <TextBlock
                                 Tap="TextBlock_Tap"
-                                Hold="TextBlock_Hold"
                                 Grid.Column="0"
                                 Padding="12"
-                                Text="{Binding Body}"
+                                Text="{Binding Name}"
                                 FontSize="{StaticResource PhoneFontSizeLarge}"/>
                         </Border>
                     </StackPanel>
