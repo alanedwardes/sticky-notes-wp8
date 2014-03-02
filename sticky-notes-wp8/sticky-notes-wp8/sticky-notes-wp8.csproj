@@ -117,7 +117,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ServiceLocator.cs" />
+    <Compile Include="Services\Locator.cs" />
     <Compile Include="Services\CamelCaseToUnderscorePropertyNamesContractResolver.cs" />
     <Compile Include="Services\LocalRepository.cs" />
     <Compile Include="Services\OnlineRepository.cs" />

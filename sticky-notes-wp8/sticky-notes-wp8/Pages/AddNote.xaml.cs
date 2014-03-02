@@ -10,12 +10,12 @@ using Microsoft.Phone.Shell;
 using System.Windows.Input;
 using System.ComponentModel;
 using sticky_notes_wp8.Data;
+using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8.Views
 {
     public partial class AddNote : PhoneApplicationPage, INotifyPropertyChanged
     {
-        private StickyNotesDataContext notesData;
         private Note currentNote;
         public Note CurrentNote
         {
@@ -40,7 +40,6 @@ namespace sticky_notes_wp8.Views
 
         private void InitializeDataContext()
         {
-            notesData = ServiceLocator.GetInstance<StickyNotesDataContext>();
             this.DataContext = this;
         }
 
@@ -49,17 +48,19 @@ namespace sticky_notes_wp8.Views
             // Call the base method.
             base.OnNavigatedFrom(e);
 
-            // Save changes to the database.
-            notesData.SubmitChanges();
+            var localRepository = Locator.Instance<LocalRepository>();
+            localRepository.Commit();
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
+            var localRepository = Locator.Instance<LocalRepository>();
+
             base.OnNavigatedTo(e); 
             string noteId;
             if (NavigationContext.QueryString.TryGetValue("noteId", out noteId))
             {
-                this.CurrentNote = this.notesData.Notes.Where(n => n.Id == int.Parse(noteId)).Single();
+                this.CurrentNote = localRepository.GetNote(int.Parse(noteId));
                 this.PageTitle.Text = "edit note";
                 this.InEditMode = true;
             }
@@ -73,12 +74,14 @@ namespace sticky_notes_wp8.Views
 
         private void SaveNote_Click(object sender, RoutedEventArgs e)
         {
+            var localRepository = Locator.Instance<LocalRepository>();
+
             if (!string.IsNullOrWhiteSpace(NoteBody.Text))
             {
                 if (!this.InEditMode)
                 {
                     this.CurrentNote.Created = DateTime.Now;
-                    notesData.Notes.InsertOnSubmit(currentNote);
+                    localRepository.StoreNote(currentNote);
                 }
 
                 NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));

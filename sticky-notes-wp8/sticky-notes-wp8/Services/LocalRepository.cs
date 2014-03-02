@@ -22,9 +22,24 @@ namespace sticky_notes_wp8.Services
             return this.dataContext.Boards.ToList();
         }
 
+        public virtual Board GetBoard(int boardId)
+        {
+            return this.dataContext.Boards.Where(b => b.Id == boardId).Single();
+        }
+
         public virtual void ClearBoard()
         {
             this.dataContext.Boards.DeleteAllOnSubmit(this.dataContext.Boards);
+        }
+
+        public virtual void ClearBoard(List<Board> boards)
+        {
+            this.dataContext.Boards.DeleteAllOnSubmit(boards);
+        }
+
+        public virtual void ClearBoard(Board board)
+        {
+            this.dataContext.Boards.DeleteOnSubmit(board);
         }
 
         public virtual void StoreBoard(Board board)
@@ -34,12 +49,17 @@ namespace sticky_notes_wp8.Services
 
         public virtual void StoreBoard(List<Board> boards)
         {
-            this.dataContext.Boards.InsertAllOnSubmit<Board>(boards);
+            this.dataContext.Boards.InsertAllOnSubmit(boards);
         }
 
         public virtual List<Note> GetNote()
         {
             return this.dataContext.Notes.ToList();
+        }
+
+        public virtual Note GetNote(int noteId)
+        {
+            return this.dataContext.Notes.Where(n => n.Id == noteId).Single();
         }
 
         public virtual void ClearNote()
@@ -52,6 +72,11 @@ namespace sticky_notes_wp8.Services
             this.dataContext.Notes.DeleteAllOnSubmit(notes);
         }
 
+        public virtual void ClearNote(Note note)
+        {
+            this.dataContext.Notes.DeleteOnSubmit(note);
+        }
+
         public virtual void StoreNote(Note note)
         {
             this.dataContext.Notes.InsertOnSubmit(note);
@@ -59,7 +84,7 @@ namespace sticky_notes_wp8.Services
 
         public virtual void StoreNote(List<Note> notes)
         {
-            this.dataContext.Notes.InsertAllOnSubmit<Note>(notes);
+            this.dataContext.Notes.InsertAllOnSubmit(notes);
         }
 
         public virtual void Commit()

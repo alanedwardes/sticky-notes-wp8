@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 using sticky_notes_wp8.Data;
+using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8
 {
@@ -25,7 +26,6 @@ namespace sticky_notes_wp8
 
         private void InitializeDataContext()
         {
-            notesData = ServiceLocator.GetInstance<StickyNotesDataContext>();
             this.DataContext = this;
         }
 
@@ -34,9 +34,6 @@ namespace sticky_notes_wp8
             this.RefreshNotes();
             base.OnNavigatedTo(e);
         }
-
-        // Data context for the local database
-        private StickyNotesDataContext notesData;
 
         // Define an observable collection property that controls can bind to.
         private ObservableCollection<Note> notes;
@@ -58,7 +55,9 @@ namespace sticky_notes_wp8
 
         private void RefreshNotes(string query = "")
         {
-            IQueryable<Note> notes = notesData.Notes;
+            var localRepository = Locator.Instance<LocalRepository>();
+            var notes = localRepository.GetNote().AsEnumerable();
+
             if (!string.IsNullOrWhiteSpace(query))
             {
                 notes = notes.Where(n => n.Body.Contains(this.SearchBox.Text));
@@ -97,6 +96,8 @@ namespace sticky_notes_wp8
 
         private void TextBlock_Hold(object sender, System.Windows.Input.GestureEventArgs e)
         {
+            var localRepository = Locator.Instance<LocalRepository>();
+
             var frameworkElement = sender as FrameworkElement;
             var note = frameworkElement.DataContext as Note;
 
@@ -105,8 +106,8 @@ namespace sticky_notes_wp8
 
             if (result == MessageBoxResult.OK)
             {
-                this.notesData.Notes.DeleteOnSubmit(note);
-                this.notesData.SubmitChanges();
+                localRepository.ClearNote(note);
+                localRepository.Commit();
                 this.RefreshNotes();
             }
         }

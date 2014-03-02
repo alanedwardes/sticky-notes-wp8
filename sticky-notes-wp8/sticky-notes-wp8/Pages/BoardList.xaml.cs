@@ -59,7 +59,7 @@ namespace sticky_notes_wp8
 
         private void RefreshBoards(string query = "")
         {
-            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+            var localRepository = Locator.Instance<LocalRepository>();
             var boards = localRepository.GetBoard();
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -94,7 +94,7 @@ namespace sticky_notes_wp8
             var frameworkElement = sender as FrameworkElement;
             var board = frameworkElement.DataContext as Board;
 
-            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+            var localRepository = Locator.Instance<LocalRepository>();
 
             var notes = localRepository.GetNote().AsEnumerable();
             notes = notes.Where(n => n.BoardId == board.Id);
@@ -115,7 +115,7 @@ namespace sticky_notes_wp8
         private async void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
             /// TEMPORARY
-            var lr = ServiceLocator.GetInstance<LocalRepository>();
+            var lr = Locator.Instance<LocalRepository>();
             lr.ClearBoard(); lr.ClearNote(); lr.Commit(); this.RefreshBoards();
             /// TEMPORARY
 
@@ -132,7 +132,7 @@ namespace sticky_notes_wp8
 
             LoadingProgress.IsIndeterminate = true;
 
-            var onlineRepository = ServiceLocator.GetInstance<OnlineRepository>();
+            var onlineRepository = Locator.Instance<OnlineRepository>();
 
             var boardsResponse = await onlineRepository.BoardsList(sessionToken);
             if (boardsResponse.code != 200)
@@ -147,7 +147,7 @@ namespace sticky_notes_wp8
                 return;
             }
 
-            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+            var localRepository = Locator.Instance<LocalRepository>();
             localRepository.ClearBoard();
             localRepository.StoreBoard(boardsResponse.data.boards);
 

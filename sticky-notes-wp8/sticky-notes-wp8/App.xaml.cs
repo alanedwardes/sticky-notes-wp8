@@ -37,8 +37,6 @@ namespace sticky_notes_wp8
             // Language display initialization
             InitializeLanguage();
 
-            InitializeDatabase();
-
             InitializeOnlineRepository();
 
             InitialiseLocalRepository();
@@ -228,32 +226,23 @@ namespace sticky_notes_wp8
             }
         }
 
-        private void InitializeDatabase()
-        {
-            var db = new StickyNotesDataContext(StickyNotesDataContext.DBConnectionString);
-            ServiceLocator.RegisterInstance<StickyNotesDataContext>(db);
-            if (!db.DatabaseExists())
-            {
-                db.CreateDatabase();
-            }
-        }
-
         private void InitializeOnlineRepository()
         {
             var repo = new OnlineRepository();
-            ServiceLocator.RegisterInstance<OnlineRepository>(repo);
+            Locator.Register<OnlineRepository>(repo);
         }
 
         private void InitialiseLocalRepository()
         {
-            var dataContext = ServiceLocator.GetInstance<StickyNotesDataContext>();
-            if (dataContext == null)
+            var dataContext = new StickyNotesDataContext(StickyNotesDataContext.DBConnectionString);
+
+            if (!dataContext.DatabaseExists())
             {
-                throw new NullReferenceException();
+                dataContext.CreateDatabase();
             }
 
             var repo = new LocalRepository(dataContext);
-            ServiceLocator.RegisterInstance<LocalRepository>(repo);
+            Locator.Register<LocalRepository>(repo);
         }
     }
 }

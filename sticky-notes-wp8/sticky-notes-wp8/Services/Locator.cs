@@ -3,16 +3,16 @@
     using System;
     using System.Collections.Generic;
 
-    public static class ServiceLocator
+    public static class Locator
     {
         private static readonly Dictionary<Type, object> Services = new Dictionary<Type, object>();
 
-        public static void RegisterInstance<T>(object service)
+        public static void Register<T>(object service)
         {
             Services.Add(typeof(T), service);
         }
 
-        public static T GetInstance<T>()
+        public static T Instance<T>()
         {
             if (Services.ContainsKey(typeof(T)))
             {
