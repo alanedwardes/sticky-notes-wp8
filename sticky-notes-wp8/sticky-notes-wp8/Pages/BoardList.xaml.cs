@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using sticky_notes_wp8.Services;
 using sticky_notes_wp8.Data;
+using Microsoft.Phone.Net.NetworkInformation;
 
 namespace sticky_notes_wp8
 {
@@ -29,7 +30,6 @@ namespace sticky_notes_wp8
 
         private void InitializeDataContext()
         {
-            boardsData = ServiceLocator.GetInstance<StickyNotesDataContext>();
             this.DataContext = this;
         }
 
@@ -38,9 +38,6 @@ namespace sticky_notes_wp8
             this.RefreshBoards();
             base.OnNavigatedTo(e);
         }
-
-        // Data context for the local database
-        private StickyNotesDataContext boardsData;
 
         // Define an observable collection property that controls can bind to.
         private ObservableCollection<Board> boards;
@@ -62,12 +59,13 @@ namespace sticky_notes_wp8
 
         private void RefreshBoards(string query = "")
         {
-            IQueryable<Board> boards = boardsData.Boards;
+            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+            var boards = localRepository.GetBoard();
             if (!string.IsNullOrWhiteSpace(query))
             {
-                boards = boards.Where(n => n.Name.Contains(this.SearchBox.Text));
+                boards = boards.Where(n => n.Name.Contains(this.SearchBox.Text)).ToList();
             }
-            //boards = boards.OrderByDescending(n => n.Created);
+            boards = boards.OrderBy(n => n.Name).ToList();
             Boards = new ObservableCollection<Board>(boards);
         }
 
@@ -91,12 +89,22 @@ namespace sticky_notes_wp8
             this.RefreshBoards(this.SearchBox.Text);
         }
 
-        private void TextBlock_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void TextBlock_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             var frameworkElement = sender as FrameworkElement;
-            var note = frameworkElement.DataContext as Note;
+            var board = frameworkElement.DataContext as Board;
 
-            NavigationService.Navigate(new Uri("/Pages/AddNote.xaml?noteId=" + note.Id, UriKind.Relative));
+            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+
+            var notes = localRepository.GetNote().AsEnumerable();
+            notes = notes.Where(n => n.BoardId == board.Id);
+
+            var result = string.Empty;
+            foreach (var note in notes)
+            {
+                result += note.Body + "\n\n";
+            }
+            MessageBox.Show(result);
         }
 
         private void BoardsButton_Click(object sender, EventArgs e)
@@ -104,25 +112,60 @@ namespace sticky_notes_wp8
             NavigationService.Navigate(new Uri("/Pages/BoardList.xaml", UriKind.Relative));
         }
 
-        private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
+        private async void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
+            /// TEMPORARY
+            var lr = ServiceLocator.GetInstance<LocalRepository>();
+            lr.ClearBoard(); lr.ClearNote(); lr.Commit(); this.RefreshBoards();
+            /// TEMPORARY
+
             if (sessionToken == null)
             {
                 NavigationService.Navigate(new Uri("/Pages/Login.xaml?redirectTo=/Pages/BoardList.xaml", UriKind.Relative));
             }
-        }
 
-        private async void ReloadButton_Click(object sender, EventArgs e)
-        {
+            var available = DeviceNetworkInformation.IsNetworkAvailable;
+            if (!available)
+            {
+                return;
+            }
+
+            LoadingProgress.IsIndeterminate = true;
+
             var onlineRepository = ServiceLocator.GetInstance<OnlineRepository>();
 
-            var boardsResponse = await onlineRepository.boardsList(sessionToken);
-            var boards = boardsResponse.data;
-            Boards.Clear();
-            foreach (var board in boards)
+            var boardsResponse = await onlineRepository.BoardsList(sessionToken);
+            if (boardsResponse.code != 200)
             {
-                Boards.Add(board);
+                LoadingProgress.IsIndeterminate = false;
+                return;
             }
+
+            if (boardsResponse.data.boards == null)
+            {
+                LoadingProgress.IsIndeterminate = false;
+                return;
+            }
+
+            var localRepository = ServiceLocator.GetInstance<LocalRepository>();
+            localRepository.ClearBoard();
+            localRepository.StoreBoard(boardsResponse.data.boards);
+
+            foreach (var board in boardsResponse.data.boards)
+            {
+                var notesResponse = await onlineRepository.NotesList(sessionToken, board.Id);
+                foreach (var note in notesResponse.data.notes)
+                {
+                    var notesToDelete = localRepository.GetNote().Where(n => n.BoardId == board.Id).ToList();
+                    localRepository.ClearNote(notesToDelete);
+                    localRepository.StoreNote(note);
+                }
+            }
+
+            localRepository.Commit();
+            this.RefreshBoards();
+
+            LoadingProgress.IsIndeterminate = false;
         }
     }
 }

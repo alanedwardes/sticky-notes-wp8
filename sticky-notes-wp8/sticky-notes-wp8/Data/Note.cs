@@ -13,45 +13,42 @@ using Microsoft.Phone.Data.Linq.Mapping;
 namespace sticky_notes_wp8.Data
 {
     [Table]
-    public class Note : INotifyPropertyChanged, INotifyPropertyChanging
+    public class Note : INotifyPropertyChanged
     {
-        private int id;
-
+        private int localStorageId;
         [Column(IsPrimaryKey = true,
             IsDbGenerated = true,
             DbType = "INT NOT NULL Identity",
             CanBeNull = false,
             AutoSync = AutoSync.OnInsert)]
+        public int LocalStorageId
+        {
+            get { return localStorageId; }
+            set { localStorageId = value; NotifyPropertyChanged("LocalStorageId"); }
+        }
+
+        private int id;
+        [Column(DbType = "INT")]
         public int Id
         {
             get { return id; }
-            set
-            {
-                if (id != value)
-                {
-                    NotifyPropertyChanging("Id");
-                    id = value;
-                    NotifyPropertyChanged("Id");
-                }
-            }
+            set { id = value; NotifyPropertyChanged("Id"); }
+        }
+
+        private int boardId;
+        [Column(DbType = "INT")]
+        public int BoardId
+        {
+            get { return boardId; }
+            set { boardId = value; NotifyPropertyChanged("BoardId"); }
         }
 
         private string body;
-
-        [Column(DbType = "NVarChar(1024) NOT NULL",
-            CanBeNull = false)]
+        [Column(DbType = "NVarChar(1024) NOT NULL", CanBeNull = false)]
         public string Body
         {
             get { return body; }
-            set
-            {
-                if (body != value)
-                {
-                    NotifyPropertyChanging("Body");
-                    body = value;
-                    NotifyPropertyChanged("Body");
-                }
-            }
+            set { body = value; NotifyPropertyChanged("Body"); }
         }
 
         private DateTime created;
@@ -59,15 +56,7 @@ namespace sticky_notes_wp8.Data
         public DateTime Created
         {
             get { return created; }
-            set
-            {
-                if (created != value)
-                {
-                    NotifyPropertyChanging("Created");
-                    created = value;
-                    NotifyPropertyChanged("Created");
-                }
-            }
+            set { created = value; NotifyPropertyChanged("Created"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -76,15 +65,6 @@ namespace sticky_notes_wp8.Data
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        public event PropertyChangingEventHandler PropertyChanging;
-        private void NotifyPropertyChanging(string propertyName)
-        {
-            if (PropertyChanging != null)
-            {
-                PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
             }
         }
     }

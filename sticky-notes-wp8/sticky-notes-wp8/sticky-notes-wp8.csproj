@@ -118,6 +118,8 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
     <Compile Include="ServiceLocator.cs" />
+    <Compile Include="Services\CamelCaseToUnderscorePropertyNamesContractResolver.cs" />
+    <Compile Include="Services\LocalRepository.cs" />
     <Compile Include="Services\OnlineRepository.cs" />
     <Compile Include="Services\SettingsManager.cs" />
   </ItemGroup>

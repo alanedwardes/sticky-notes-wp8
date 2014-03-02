@@ -41,6 +41,8 @@ namespace sticky_notes_wp8
 
             InitializeOnlineRepository();
 
+            InitialiseLocalRepository();
+
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
             {
@@ -240,6 +242,18 @@ namespace sticky_notes_wp8
         {
             var repo = new OnlineRepository();
             ServiceLocator.RegisterInstance<OnlineRepository>(repo);
+        }
+
+        private void InitialiseLocalRepository()
+        {
+            var dataContext = ServiceLocator.GetInstance<StickyNotesDataContext>();
+            if (dataContext == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            var repo = new LocalRepository(dataContext);
+            ServiceLocator.RegisterInstance<LocalRepository>(repo);
         }
     }
 }

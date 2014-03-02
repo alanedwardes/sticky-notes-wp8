@@ -29,7 +29,7 @@ namespace sticky_notes_wp8
             loginButton.IsEnabled = false;
 
             var onlineRepository = ServiceLocator.GetInstance<OnlineRepository>();
-            var response = await onlineRepository.userLogin(this.username.Text, this.password.Password);
+            var response = await onlineRepository.UserLogin(this.username.Text, this.password.Password);
 
             loginButton.IsEnabled = true;
             loginProgress.IsIndeterminate = false;

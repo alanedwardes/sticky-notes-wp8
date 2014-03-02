@@ -51,13 +51,15 @@
                 Margin="12,4"
                 Text="email address"/>
             <TextBox
-                x:Name="username"/>
+                x:Name="username"
+                Text="test@example.com"/>
             <TextBlock
                 FontSize="{StaticResource PhoneFontSizeMedium}"
                 Margin="12,4"
                 Text="password"/>
             <PasswordBox
-                x:Name="password"/>
+                x:Name="password"
+                Password="password"/>
             <Button
                 Content="login"
                 Click="Button_Click" />

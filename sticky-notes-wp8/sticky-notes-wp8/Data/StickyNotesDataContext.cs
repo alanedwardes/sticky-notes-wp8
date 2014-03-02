@@ -11,7 +11,7 @@ using Microsoft.Phone.Data.Linq.Mapping;
 
 namespace sticky_notes_wp8.Data
 {
-    class StickyNotesDataContext : DataContext
+    public class StickyNotesDataContext : DataContext
     {
         public const string DBConnectionString = "Data Source=isostore:/StickyNotes.sdf";
 

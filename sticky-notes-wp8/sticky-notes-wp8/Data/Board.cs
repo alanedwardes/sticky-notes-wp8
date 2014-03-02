@@ -13,45 +13,35 @@ using Microsoft.Phone.Data.Linq.Mapping;
 namespace sticky_notes_wp8.Data
 {
     [Table]
-    public class Board : INotifyPropertyChanged, INotifyPropertyChanging
+    public class Board : INotifyPropertyChanged
     {
-        private int id;
-
+        private int localStorageId;
         [Column(IsPrimaryKey = true,
             IsDbGenerated = true,
             DbType = "INT NOT NULL Identity",
             CanBeNull = false,
             AutoSync = AutoSync.OnInsert)]
+        public int LocalStorageId
+        {
+            get { return localStorageId; }
+            set { localStorageId = value; NotifyPropertyChanged("LocalStorageId"); }
+        }
+
+        private int id;
+        [Column(DbType = "INT")]
         public int Id
         {
             get { return id; }
-            set
-            {
-                if (id != value)
-                {
-                    NotifyPropertyChanging("Id");
-                    id = value;
-                    NotifyPropertyChanged("Id");
-                }
-            }
+            set { id = value; NotifyPropertyChanged("Id"); }
         }
 
         private string name;
-
         [Column(DbType = "NVarChar(255) NOT NULL",
             CanBeNull = false)]
         public string Name
         {
             get { return name; }
-            set
-            {
-                if (name != value)
-                {
-                    NotifyPropertyChanging("Name");
-                    name = value;
-                    NotifyPropertyChanged("Name");
-                }
-            }
+            set { name = value; NotifyPropertyChanged("Name"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -60,15 +50,6 @@ namespace sticky_notes_wp8.Data
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        public event PropertyChangingEventHandler PropertyChanging;
-        private void NotifyPropertyChanging(string propertyName)
-        {
-            if (PropertyChanging != null)
-            {
-                PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
             }
         }
     }
