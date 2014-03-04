@@ -18,9 +18,11 @@
     <Grid x:Name="LayoutRoot" Background="{StaticResource SNBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
-            <RowDefinition Height="7*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!--TitlePanel contains the name of the application and page title-->
@@ -43,27 +45,54 @@
         <ProgressBar x:Name="LoadingProgress"
             IsIndeterminate="False"
             Height="10"
-            Margin="12,0"
+            Margin="12, 0"
             Foreground="{StaticResource PhoneForegroundBrush}"
             Grid.Row="2"/>
+
+        <Button
+            Grid.Row="3"
+            Tap="NotesOnPhoneButtonTap"
+            Margin="12, 0">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <Image
+                        Height="40"
+                        Width="40"
+                        Source="/Assets/PhoneIcon.png"></Image>
+                    <TextBlock
+                        Margin="4, 0, 0, 0"
+                        Text="my notes"
+                        VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+
+        <TextBlock
+                FontSize="{StaticResource PhoneFontSizeMedium}"
+                Margin="24, 0, 24, 12"
+                Grid.Row="4"
+                Text="boards shared with me"/>
 
         <ListBox HorizontalContentAlignment="Stretch"
                  HorizontalAlignment="Stretch"
                  Foreground="Black"
                  ItemsSource="{Binding Boards}"
-                 Grid.Row="3"
+                 Grid.Row="5"
                  Margin="24, 0, 24, 24">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel>
-                        <Border Background="{StaticResource SNNoteBackgroundBrush}">
-                            <TextBlock
-                                Tap="TextBlock_Tap"
-                                Grid.Column="0"
-                                Padding="12"
-                                Text="{Binding Name}"
-                                FontSize="{StaticResource PhoneFontSizeLarge}"/>
-                        </Border>
+                    <StackPanel Margin="0, 6, 0, 0" Background="{StaticResource SNNoteBackgroundBrush}" Orientation="Horizontal">
+                        <Image
+                             Margin="12, 0, 0, 0"
+                             Height="40"
+                             Width="40"
+                             Source="/Assets/BoardIconInverse.png"></Image>
+                        <TextBlock
+                            Tap="TextBlock_Tap"
+                             Grid.Column="0"
+                             Padding="12"
+                             Text="{Binding Name}"
+                             FontSize="{StaticResource PhoneFontSizeLarge}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

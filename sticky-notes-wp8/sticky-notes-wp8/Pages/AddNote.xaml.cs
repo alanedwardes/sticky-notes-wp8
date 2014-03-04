@@ -60,7 +60,7 @@ namespace sticky_notes_wp8.Views
             string noteId;
             if (NavigationContext.QueryString.TryGetValue("noteId", out noteId))
             {
-                this.CurrentNote = localRepository.GetNote(int.Parse(noteId));
+                this.CurrentNote = localRepository.GetNote().Where(n => n.LocalStorageId == int.Parse(noteId)).Single();
                 this.PageTitle.Text = "edit note";
                 this.InEditMode = true;
             }

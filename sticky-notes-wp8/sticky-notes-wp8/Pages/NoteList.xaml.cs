@@ -17,6 +17,22 @@ namespace sticky_notes_wp8
 {
     public partial class NoteList : PhoneApplicationPage, INotifyPropertyChanged
     {
+        private Board filterBoard;
+        private string pageTitle;
+
+        public string PageTitle
+        {
+            get
+            {
+                return this.pageTitle;
+            }
+            set
+            {
+                this.pageTitle = value;
+                NotifyPropertyChanged("PageTitle");
+            }
+        }
+
         public NoteList()
         {
             InitializeComponent();
@@ -31,8 +47,21 @@ namespace sticky_notes_wp8
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            this.RefreshNotes();
+            var localRepository = Locator.Instance<LocalRepository>();
+
             base.OnNavigatedTo(e);
+
+            string boardId;
+            if (NavigationContext.QueryString.TryGetValue("boardId", out boardId))
+            {
+                this.filterBoard = localRepository.GetBoard(int.Parse(boardId));
+            }
+            else
+            {
+                this.filterBoard = null;
+            }
+
+            this.RefreshNotes();
         }
 
         // Define an observable collection property that controls can bind to.
@@ -62,6 +91,18 @@ namespace sticky_notes_wp8
             {
                 notes = notes.Where(n => n.Body.Contains(this.SearchBox.Text));
             }
+
+            if (this.filterBoard != null)
+            {
+                PageTitle = filterBoard.Name;
+                notes = notes.Where(n => n.BoardId == this.filterBoard.Id);
+            }
+            else
+            {
+                PageTitle = "my notes";
+                notes = notes.Where(n => n.BoardId == 0);
+            }
+
             notes = notes.OrderByDescending(n => n.Created);
             Notes = new ObservableCollection<Note>(notes);
         }
@@ -91,7 +132,7 @@ namespace sticky_notes_wp8
             var frameworkElement = sender as FrameworkElement;
             var note = frameworkElement.DataContext as Note;
 
-            NavigationService.Navigate(new Uri("/Pages/AddNote.xaml?noteId=" + note.Id, UriKind.Relative));
+            NavigationService.Navigate(new Uri("/Pages/AddNote.xaml?noteId=" + note.LocalStorageId, UriKind.Relative));
         }
 
         private void TextBlock_Hold(object sender, System.Windows.Input.GestureEventArgs e)

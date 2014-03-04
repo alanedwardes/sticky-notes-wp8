@@ -61,10 +61,12 @@ namespace sticky_notes_wp8
         {
             var localRepository = Locator.Instance<LocalRepository>();
             var boards = localRepository.GetBoard();
+
             if (!string.IsNullOrWhiteSpace(query))
             {
                 boards = boards.Where(n => n.Name.Contains(this.SearchBox.Text)).ToList();
             }
+
             boards = boards.OrderBy(n => n.Name).ToList();
             Boards = new ObservableCollection<Board>(boards);
         }
@@ -94,17 +96,8 @@ namespace sticky_notes_wp8
             var frameworkElement = sender as FrameworkElement;
             var board = frameworkElement.DataContext as Board;
 
-            var localRepository = Locator.Instance<LocalRepository>();
-
-            var notes = localRepository.GetNote().AsEnumerable();
-            notes = notes.Where(n => n.BoardId == board.Id);
-
-            var result = string.Empty;
-            foreach (var note in notes)
-            {
-                result += note.Body + "\n\n";
-            }
-            MessageBox.Show(result);
+            NavigationService.Navigate(new Uri(string.Format("/Pages/NoteList.xaml?boardId={0}", board.Id),
+                UriKind.Relative));
         }
 
         private void BoardsButton_Click(object sender, EventArgs e)
@@ -114,11 +107,6 @@ namespace sticky_notes_wp8
 
         private async void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            /// TEMPORARY
-            var lr = Locator.Instance<LocalRepository>();
-            lr.ClearBoard(); lr.ClearNote(); lr.Commit(); this.RefreshBoards();
-            /// TEMPORARY
-
             if (sessionToken == null)
             {
                 NavigationService.Navigate(new Uri("/Pages/Login.xaml?redirectTo=/Pages/BoardList.xaml", UriKind.Relative));
@@ -166,6 +154,11 @@ namespace sticky_notes_wp8
             this.RefreshBoards();
 
             LoadingProgress.IsIndeterminate = false;
+        }
+
+        private void NotesOnPhoneButtonTap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
         }
     }
 }
