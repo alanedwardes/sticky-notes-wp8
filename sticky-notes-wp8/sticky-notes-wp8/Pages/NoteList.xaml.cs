@@ -20,6 +20,11 @@ namespace sticky_notes_wp8
         private Board filterBoard;
         private string pageTitle;
 
+        public StickyNotesSettingsManager SettingsManager
+        {
+            get { return Locator.Instance<StickyNotesSettingsManager>(); }
+        }
+
         public string PageTitle
         {
             get
@@ -161,6 +166,11 @@ namespace sticky_notes_wp8
         private void BoardsButton_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/Pages/BoardList.xaml", UriKind.Relative));
+        }
+
+        private void SettingsButton_Click(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/Pages/Settings.xaml", UriKind.Relative));
         }
     }
 }

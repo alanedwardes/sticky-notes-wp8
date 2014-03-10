@@ -47,21 +47,24 @@
             	<Run/>
             </TextBlock>
             <TextBlock
-                FontSize="{StaticResource PhoneFontSizeMedium}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 Margin="12,4"
                 Text="email address"/>
             <TextBox
+                FontSize="{Binding SettingsManager.TextSize}"
                 x:Name="username"
                 Text="test@example.com"/>
             <TextBlock
-                FontSize="{StaticResource PhoneFontSizeMedium}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 Margin="12,4"
                 Text="password"/>
             <PasswordBox
                 x:Name="password"
+                FontSize="{Binding SettingsManager.TextSize}"
                 Password="password"/>
             <Button
                 Content="login"
+                FontSize="{Binding SettingsManager.TextSize}"
                 Click="Button_Click" />
             <ProgressBar
                 x:Name="loginProgress"

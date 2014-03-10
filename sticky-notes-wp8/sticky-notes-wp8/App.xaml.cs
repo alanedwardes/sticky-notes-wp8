@@ -41,6 +41,8 @@ namespace sticky_notes_wp8
 
             InitialiseLocalRepository();
 
+            InitialiseSettingsManager();
+
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
             {
@@ -243,6 +245,12 @@ namespace sticky_notes_wp8
 
             var repo = new LocalRepository(dataContext);
             Locator.Register<LocalRepository>(repo);
+        }
+
+        private void InitialiseSettingsManager()
+        {
+            var manager = new StickyNotesSettingsManager();
+            Locator.Register<StickyNotesSettingsManager>(manager);
         }
     }
 }

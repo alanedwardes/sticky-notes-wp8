@@ -7,18 +7,41 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 using sticky_notes_wp8.Resources;
 using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8
 {
-    public partial class Login : PhoneApplicationPage
+    public partial class Login : PhoneApplicationPage, INotifyPropertyChanged
     {
         private string redirectUri;
+
+        public StickyNotesSettingsManager SettingsManager
+        {
+            get { return Locator.Instance<StickyNotesSettingsManager>(); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public Login()
         {
             InitializeComponent();
+
+            InitializeDataContext();
+        }
+
+        private void InitializeDataContext()
+        {
+            this.DataContext = this;
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -70,9 +93,8 @@ namespace sticky_notes_wp8
 
         private void SaveUserTokenFromLoginResponse(OnlineRepository.RepositoryResponse<OnlineRepository.LoginResponse> response)
         {
-            SettingsManager.SaveSetting(SettingsManager.SESSION_TOKEN, response.data.session.id);
+            Locator.Instance<StickyNotesSettingsManager>().SessionToken = response.data.session.id;
 
-            // SettingsManager.GetSetting<string>(SettingsManager.SESSION_TOKEN);
             if (redirectUri != null)
             {
                 NavigationService.Navigate(new Uri(redirectUri, UriKind.Relative));

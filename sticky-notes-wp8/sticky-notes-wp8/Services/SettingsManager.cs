@@ -7,10 +7,8 @@ using System.IO.IsolatedStorage;
 
 namespace sticky_notes_wp8.Services
 {
-    static class SettingsManager
+    public static class SettingsManager
     {
-        public const string SESSION_TOKEN = "session_token";
-
         private static IsolatedStorageSettings GetIsolatedStorageSettings()
         {
             return IsolatedStorageSettings.ApplicationSettings;
@@ -28,13 +26,13 @@ namespace sticky_notes_wp8.Services
             storage.Save();
         }
 
-        public static T GetSetting<T>(string key)
+        public static T GetSetting<T>(string key, T defaultValue = default(T))
         {
             var storage = GetIsolatedStorageSettings();
             if (storage.Contains(key))
                 return (T)storage[key];
             else
-                return default(T);
+                return defaultValue;
         }
     }
 }

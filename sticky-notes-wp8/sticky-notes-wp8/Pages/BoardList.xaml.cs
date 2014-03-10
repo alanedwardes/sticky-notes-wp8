@@ -25,12 +25,17 @@ namespace sticky_notes_wp8
 
             InitializeDataContext();
 
-            sessionToken = SettingsManager.GetSetting<string>(SettingsManager.SESSION_TOKEN);
+            sessionToken = Locator.Instance<StickyNotesSettingsManager>().SessionToken;
         }
 
         private void InitializeDataContext()
         {
             this.DataContext = this;
+        }
+
+        public StickyNotesSettingsManager SettingsManager
+        {
+            get { return Locator.Instance<StickyNotesSettingsManager>(); }
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)

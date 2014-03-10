@@ -30,6 +30,11 @@ namespace sticky_notes_wp8.Views
             }
         }
 
+        public StickyNotesSettingsManager SettingsManager
+        {
+            get { return Locator.Instance<StickyNotesSettingsManager>(); }
+        }
+
         public bool InEditMode;
 
         public AddNote()

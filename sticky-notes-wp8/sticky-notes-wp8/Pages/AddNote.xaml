@@ -36,13 +36,14 @@
             <TextBox
                 Name="NoteBody"
                 VerticalAlignment="Stretch"
+                FontSize="{Binding SettingsManager.TextSize}"
                 HorizontalAlignment="Stretch"
                 KeyDown="NoteBody_KeyDown"
                 Text="{Binding CurrentNote.Body, Mode=TwoWay}"
                 Grid.Row="0"/>
             <Button
                 x:Name="SaveNote"
-                FontSize="{StaticResource PhoneFontSizeLarge}"
+                FontSize="{Binding SettingsManager.TextSize}"
                 Content="Save"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"

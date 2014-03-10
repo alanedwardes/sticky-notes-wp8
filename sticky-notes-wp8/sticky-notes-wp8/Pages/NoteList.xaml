@@ -25,6 +25,11 @@
                 IconUri="/Assets/BoardsIcon.png"
                 Click="BoardsButton_Click"
                 Text="Boards"/>
+            <shell:ApplicationBarIconButton
+                x:Name="SettingsButton"
+                IconUri="/Assets/SettingsIcon.png"
+                Click="SettingsButton_Click"
+                Text="add note"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
@@ -55,6 +60,7 @@
         <ListBox HorizontalContentAlignment="Stretch"
                  HorizontalAlignment="Stretch"
                  Foreground="Black"
+                 x:Name="noteList"
                  ItemsSource="{Binding Notes}"
                  Grid.Row="2"
                  Margin="24, 0, 24, 24">
@@ -86,8 +92,9 @@
                                 Hold="TextBlock_Hold"
                                 Grid.Column="0"
                                 Padding="12"
+                                TextWrapping="Wrap"
                                 Text="{Binding Body}"
-                                FontSize="{StaticResource PhoneFontSizeLarge}"/>
+                                FontSize="{Binding ElementName=noteList, Path=DataContext.SettingsManager.TextSize}"/>
                         </Border>
                     </StackPanel>
                 </DataTemplate>
