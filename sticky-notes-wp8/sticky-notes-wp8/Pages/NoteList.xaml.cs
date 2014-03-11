@@ -137,7 +137,13 @@ namespace sticky_notes_wp8
             var frameworkElement = sender as FrameworkElement;
             var note = frameworkElement.DataContext as Note;
 
-            NavigationService.Navigate(new Uri("/Pages/AddNote.xaml?noteId=" + note.LocalStorageId, UriKind.Relative));
+            var addNoteRedirect = "/Pages/AddNote.xaml?noteId=" + note.LocalStorageId;
+            if (this.filterBoard != null)
+            {
+                addNoteRedirect += "&boardId=" + filterBoard.LocalStorageId;
+            }
+
+            NavigationService.Navigate(new Uri(addNoteRedirect, UriKind.Relative));
         }
 
         private void TextBlock_Hold(object sender, System.Windows.Input.GestureEventArgs e)
@@ -160,7 +166,12 @@ namespace sticky_notes_wp8
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            NavigationService.Navigate(new Uri("/Pages/AddNote.xaml", UriKind.Relative));
+            var addNoteRedirect = "/Pages/AddNote.xaml";
+            if (this.filterBoard != null)
+            {
+                addNoteRedirect += "?boardId=" + filterBoard.LocalStorageId;
+            }
+            NavigationService.Navigate(new Uri(addNoteRedirect, UriKind.Relative));
         }
 
         private void BoardsButton_Click(object sender, EventArgs e)

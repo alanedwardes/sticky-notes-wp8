@@ -30,24 +30,31 @@
 
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12">
             <Grid.RowDefinitions>
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
+            <TextBox
+                Name="NoteTitle"
+                KeyDown="NoteTitle_KeyDown"
+                FontSize="{Binding SettingsManager.TextSize}"
+                Text="{Binding CurrentNote.Title, Mode=TwoWay}" />
             <TextBox
                 Name="NoteBody"
                 VerticalAlignment="Stretch"
                 FontSize="{Binding SettingsManager.TextSize}"
+                TextWrapping="Wrap"
                 HorizontalAlignment="Stretch"
                 KeyDown="NoteBody_KeyDown"
                 Text="{Binding CurrentNote.Body, Mode=TwoWay}"
-                Grid.Row="0"/>
+                Grid.Row="1"/>
             <Button
                 x:Name="SaveNote"
-                FontSize="{Binding SettingsManager.TextSize}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 Content="Save"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
-                Grid.Row="1" Click="SaveNote_Click"/>
+                Grid.Row="2" Click="SaveNote_Click"/>
         </Grid>
     </Grid>
 </phone:PhoneApplicationPage>

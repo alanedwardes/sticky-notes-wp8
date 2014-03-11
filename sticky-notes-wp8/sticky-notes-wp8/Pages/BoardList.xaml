@@ -38,6 +38,7 @@
             x:Name="SearchBox"
             Margin="12,0"
             TextAlignment="Left"
+            FontSize="{Binding SettingsManager.CaptionTextSize}"
             VerticalAlignment="Center"
             Text="Search boards..."
             Grid.Row="1"/>

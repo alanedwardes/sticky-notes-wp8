@@ -12,14 +12,16 @@ namespace sticky_notes_wp8.Services
     {
         private const string SESSION_TOKEN = "session_token";
         private const string TEXT_SIZE = "text_size";
-        private const double TEXT_SIZE_DEFAULT = 10d;
+
+        public double MinTextSize { get { return 30d; } }
+        public double MaxTextSize { get { return 50d; } }
 
         public double TextSize
         {
             get
             {
-                var textSize = SettingsManager.GetSetting<double>(TEXT_SIZE);
-                return textSize > 0 ? textSize : TEXT_SIZE_DEFAULT;
+                var textSize = SettingsManager.GetSetting<double>(TEXT_SIZE, MinTextSize);
+                return textSize < MinTextSize ? MinTextSize : textSize;
             }
             set
             {

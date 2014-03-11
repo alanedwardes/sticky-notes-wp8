@@ -43,6 +43,14 @@ namespace sticky_notes_wp8.Data
             set { boardId = value; NotifyPropertyChanged("BoardId"); }
         }
 
+        private string title;
+        [Column(DbType = "NVarChar(255) NULL", CanBeNull = true)]
+        public string Title
+        {
+            get { return title; }
+            set { title = value; NotifyPropertyChanged("Title"); }
+        }
+
         private string body;
         [Column(DbType = "NVarChar(1024) NOT NULL", CanBeNull = false)]
         public string Body

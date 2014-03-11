@@ -30,6 +30,8 @@ namespace sticky_notes_wp8.Views
             }
         }
 
+        private Board currentBoard;
+
         public StickyNotesSettingsManager SettingsManager
         {
             get { return Locator.Instance<StickyNotesSettingsManager>(); }
@@ -75,11 +77,23 @@ namespace sticky_notes_wp8.Views
                 this.PageTitle.Text = "new note";
                 this.InEditMode = false;
             }
+
+            string boardId;
+            if (NavigationContext.QueryString.TryGetValue("boardId", out boardId))
+            {
+                this.currentBoard = localRepository.GetBoard().Where(b => b.LocalStorageId == int.Parse(boardId)).Single();
+            }
+            else
+            {
+                this.currentBoard = null;
+            }
         }
 
         private void SaveNote_Click(object sender, RoutedEventArgs e)
         {
             var localRepository = Locator.Instance<LocalRepository>();
+            var onlineRepository = Locator.Instance<OnlineRepository>();
+            var settingsManager = Locator.Instance<StickyNotesSettingsManager>();
 
             if (!string.IsNullOrWhiteSpace(NoteBody.Text))
             {
@@ -89,7 +103,18 @@ namespace sticky_notes_wp8.Views
                     localRepository.StoreNote(currentNote);
                 }
 
-                NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
+                localRepository.Commit();
+
+                if (this.currentBoard != null)
+                {
+                    onlineRepository.NotesSave(settingsManager.SessionToken, this.currentNote, this.currentBoard.Id);
+
+                    NavigationService.Navigate(new Uri(string.Format("/Pages/NoteList.xaml?boardId={0}", this.currentBoard.Id), UriKind.Relative));
+                }
+                else
+                {
+                    NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
+                }
             }
         }
 
@@ -107,6 +132,14 @@ namespace sticky_notes_wp8.Views
             if (e.Key.Equals(Key.Enter))
             {
                 this.SaveNote.Focus();
+            }
+        }
+
+        private void NoteTitle_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key.Equals(Key.Enter))
+            {
+                this.NoteBody.Focus();
             }
         }
     }

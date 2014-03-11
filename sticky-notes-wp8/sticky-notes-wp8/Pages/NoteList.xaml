@@ -29,7 +29,7 @@
                 x:Name="SettingsButton"
                 IconUri="/Assets/SettingsIcon.png"
                 Click="SettingsButton_Click"
-                Text="add note"/>
+                Text="settings"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
@@ -37,8 +37,8 @@
     <Grid x:Name="LayoutRoot" Background="{StaticResource SNBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="7*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!--TitlePanel contains the name of the application and page title-->
@@ -52,6 +52,7 @@
             GotFocus="SearchBox_GotFocus"
             KeyUp="SearchBox_KeyUp"
             x:Name="SearchBox"
+            FontSize="{Binding SettingsManager.CaptionTextSize}"
             Margin="12,0"
             TextAlignment="Left"
             VerticalAlignment="Center"

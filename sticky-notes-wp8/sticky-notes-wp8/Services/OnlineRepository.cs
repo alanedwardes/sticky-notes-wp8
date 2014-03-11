@@ -26,6 +26,7 @@ namespace sticky_notes_wp8.Services
             public struct Notes
             {
                 public const string List = "notes/list";
+                public const string Save = "notes/save";
             }
         }
 
@@ -53,6 +54,11 @@ namespace sticky_notes_wp8.Services
         public class NotesListResponse
         {
             public List<Note> notes;
+        }
+
+        public class NotesSaveResponse : Note
+        {
+
         }
 
         public class RepositoryResponse<T>
@@ -91,7 +97,7 @@ namespace sticky_notes_wp8.Services
             var stringContent = new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded");
 
             // Timeout is 500 milliseconds
-            httpClient.Timeout = TimeSpan.FromMilliseconds(1000);
+            httpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 
             HttpResponseMessage response;
             try
@@ -141,6 +147,16 @@ namespace sticky_notes_wp8.Services
             data.Add("token", token);
             data.Add("boardID", boardId.ToString());
             return await HttpPostAsync<NotesListResponse>(APIMethods.Notes.List, data);
+        }
+
+        public async Task<RepositoryResponse<NotesSaveResponse>> NotesSave(string token, Note note, int boardId)
+        {
+            var data = new Dictionary<string, string>();
+            data.Add("token", token);
+            data.Add("title", note.Title);
+            data.Add("body", note.Body);
+            data.Add("boardID", boardId.ToString());
+            return await HttpPostAsync<NotesSaveResponse>(APIMethods.Notes.Save, data);
         }
     }
 }

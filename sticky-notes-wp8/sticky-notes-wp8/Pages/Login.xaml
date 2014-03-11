@@ -51,7 +51,7 @@
                 Margin="12,4"
                 Text="email address"/>
             <TextBox
-                FontSize="{Binding SettingsManager.TextSize}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 x:Name="username"
                 Text="test@example.com"/>
             <TextBlock
@@ -60,11 +60,11 @@
                 Text="password"/>
             <PasswordBox
                 x:Name="password"
-                FontSize="{Binding SettingsManager.TextSize}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 Password="password"/>
             <Button
                 Content="login"
-                FontSize="{Binding SettingsManager.TextSize}"
+                FontSize="{Binding SettingsManager.CaptionTextSize}"
                 Click="Button_Click" />
             <ProgressBar
                 x:Name="loginProgress"
