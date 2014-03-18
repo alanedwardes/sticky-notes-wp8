@@ -11,7 +11,7 @@ using sticky_notes_wp8.Data;
 
 namespace sticky_notes_wp8.Services
 {
-    class OnlineRepository
+    public class OnlineRepository
     {
         struct APIMethods
         {
@@ -22,6 +22,7 @@ namespace sticky_notes_wp8.Services
             public struct Boards
             {
                 public const string List = "boards/list";
+                public const string Save = "boards/save";
             }
             public struct Notes
             {
@@ -70,6 +71,11 @@ namespace sticky_notes_wp8.Services
         public class BoardsListResponse
         {
             public List<Board> boards;
+        }
+
+        public class BoardsSaveResponse: Board
+        {
+
         }
 
         const string ENDPOINT = "http://stickyapi.alanedwardes.com/";
@@ -157,6 +163,14 @@ namespace sticky_notes_wp8.Services
             data.Add("body", note.Body);
             data.Add("boardID", boardId.ToString());
             return await HttpPostAsync<NotesSaveResponse>(APIMethods.Notes.Save, data);
+        }
+
+        public async Task<RepositoryResponse<BoardsSaveResponse>> BoardsSave(string token, Board board)
+        {
+            var data = new Dictionary<string, string>();
+            data.Add("token", token);
+            data.Add("name", board.Name);
+            return await HttpPostAsync<BoardsSaveResponse>(APIMethods.Boards.Save, data);
         }
     }
 }

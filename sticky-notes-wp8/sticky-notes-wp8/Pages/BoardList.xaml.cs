@@ -165,5 +165,10 @@ namespace sticky_notes_wp8
         {
             NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
         }
+
+        private void AddButton_Click(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/Pages/AddBoard.xaml", UriKind.Relative));
+        }
     }
 }

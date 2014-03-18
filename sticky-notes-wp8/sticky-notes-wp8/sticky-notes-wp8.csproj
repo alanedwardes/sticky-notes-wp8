@@ -99,9 +99,13 @@
     <Compile Include="Data\StickyNotesDataContext.cs" />
     <Compile Include="Data\Note.cs" />
     <Compile Include="LocalizedStrings.cs" />
+    <Compile Include="Pages\AddBoard.xaml.cs">
+      <DependentUpon>AddBoard.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\AddNote.xaml.cs">
       <DependentUpon>AddNote.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\BaseStickyNotesPage.cs" />
     <Compile Include="Pages\EditUser.xaml.cs">
       <DependentUpon>EditUser.xaml</DependentUpon>
     </Compile>
@@ -135,6 +139,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="Pages\AddBoard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\AddNote.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
