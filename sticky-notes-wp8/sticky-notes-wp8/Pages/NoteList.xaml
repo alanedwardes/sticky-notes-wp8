@@ -1,4 +1,5 @@
-﻿<phone:PhoneApplicationPage
+﻿<pages:BaseStickyNotesPage
+    xmlns:pages="clr-namespace:sticky_notes_wp8.Pages"
     x:Class="sticky_notes_wp8.NoteList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -38,6 +39,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -58,6 +60,14 @@
             VerticalAlignment="Center"
             Text="Search notes..."
             Grid.Row="1"/>
+        
+        <ProgressBar
+            IsIndeterminate="{Binding IsLoadingData}"
+            Height="10"
+            Margin="12, 0"
+            Foreground="{StaticResource PhoneForegroundBrush}"
+            Grid.Row="2"/>
+        
         <ListBox HorizontalContentAlignment="Stretch"
                  HorizontalAlignment="Stretch"
                  Foreground="Black"
@@ -108,4 +118,4 @@
         </ListBox>
     </Grid>
 
-</phone:PhoneApplicationPage>
+</pages:BaseStickyNotesPage>

@@ -12,54 +12,67 @@ using System.Collections.ObjectModel;
 
 using sticky_notes_wp8.Data;
 using sticky_notes_wp8.Services;
+using sticky_notes_wp8.Pages;
 
 namespace sticky_notes_wp8
 {
-    public partial class NoteList : PhoneApplicationPage, INotifyPropertyChanged
+    public partial class NoteList : BaseStickyNotesPage
     {
-        private Board filterBoard;
-        private string pageTitle;
-
-        public StickyNotesSettingsManager SettingsManager
+        private bool isLoadingData;
+        public bool IsLoadingData
         {
-            get { return Locator.Instance<StickyNotesSettingsManager>(); }
+            get { return this.isLoadingData; }
+            set { this.isLoadingData = value; NotifyPropertyChanged("IsLoadingData"); }
         }
 
+        private string pageTitle;
         public string PageTitle
         {
-            get
-            {
-                return this.pageTitle;
-            }
-            set
-            {
-                this.pageTitle = value;
-                NotifyPropertyChanged("PageTitle");
-            }
+            get { return this.pageTitle; }
+            set { this.pageTitle = value; NotifyPropertyChanged("PageTitle"); }
         }
+
+        private ObservableCollection<Note> notes;
+        public ObservableCollection<Note> Notes
+        {
+            get { return notes; }
+            set { notes = value; NotifyPropertyChanged("Notes"); }
+        }
+
+        private Board filterBoard;
 
         public NoteList()
         {
             InitializeComponent();
-
             InitializeDataContext();
         }
 
-        private void InitializeDataContext()
+        protected async override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            this.DataContext = this;
-        }
-
-        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
-        {
-            var localRepository = Locator.Instance<LocalRepository>();
-
             base.OnNavigatedTo(e);
 
             string boardId;
             if (NavigationContext.QueryString.TryGetValue("boardId", out boardId))
             {
-                this.filterBoard = localRepository.GetBoard(int.Parse(boardId));
+                this.filterBoard = this.LocalRepository.GetBoard(int.Parse(boardId));
+
+                // Refresh notes
+                IsLoadingData = true;
+                var notesResponse = await this.OnlineRepository.NotesList(this.SettingsManager.SessionToken, this.filterBoard.Id);
+                if (notesResponse.WasSuccessful())
+                {
+                    var notesToDelete = this.LocalRepository.GetNote().Where(n => n.BoardId == this.filterBoard.Id).ToList();
+                    this.LocalRepository.ClearNote(notesToDelete);
+
+                    foreach (var note in notesResponse.data.notes)
+                    {
+                        this.LocalRepository.StoreNote(note);
+                    }
+
+                    this.LocalRepository.Commit();
+                }
+
+                IsLoadingData = false;
             }
             else
             {
@@ -69,28 +82,9 @@ namespace sticky_notes_wp8
             this.RefreshNotes();
         }
 
-        // Define an observable collection property that controls can bind to.
-        private ObservableCollection<Note> notes;
-        public ObservableCollection<Note> Notes
-        {
-            get
-            {
-                return notes;
-            }
-            set
-            {
-                if (notes != value)
-                {
-                    notes = value;
-                    NotifyPropertyChanged("Notes");
-                }
-            }
-        }
-
         private void RefreshNotes(string query = "")
         {
-            var localRepository = Locator.Instance<LocalRepository>();
-            var notes = localRepository.GetNote().AsEnumerable();
+            var notes = this.LocalRepository.GetNote().AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -110,15 +104,6 @@ namespace sticky_notes_wp8
 
             notes = notes.OrderByDescending(n => n.Created);
             Notes = new ObservableCollection<Note>(notes);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
         }
 
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
@@ -148,8 +133,6 @@ namespace sticky_notes_wp8
 
         private void TextBlock_Hold(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            var localRepository = Locator.Instance<LocalRepository>();
-
             var frameworkElement = sender as FrameworkElement;
             var note = frameworkElement.DataContext as Note;
 
@@ -158,8 +141,8 @@ namespace sticky_notes_wp8
 
             if (result == MessageBoxResult.OK)
             {
-                localRepository.ClearNote(note);
-                localRepository.Commit();
+                this.LocalRepository.ClearNote(note);
+                this.LocalRepository.Commit();
                 this.RefreshNotes();
             }
         }
@@ -167,10 +150,12 @@ namespace sticky_notes_wp8
         private void AddButton_Click(object sender, EventArgs e)
         {
             var addNoteRedirect = "/Pages/AddNote.xaml";
+
             if (this.filterBoard != null)
             {
                 addNoteRedirect += "?boardId=" + filterBoard.LocalStorageId;
             }
+
             NavigationService.Navigate(new Uri(addNoteRedirect, UriKind.Relative));
         }
 

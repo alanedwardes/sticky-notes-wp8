@@ -12,36 +12,18 @@ using System.Collections.ObjectModel;
 using sticky_notes_wp8.Resources;
 using sticky_notes_wp8.Services;
 
+using sticky_notes_wp8.Pages;
+
 namespace sticky_notes_wp8
 {
-    public partial class Login : PhoneApplicationPage, INotifyPropertyChanged
+    public partial class Login : BaseStickyNotesPage
     {
         private string redirectUri;
-
-        public StickyNotesSettingsManager SettingsManager
-        {
-            get { return Locator.Instance<StickyNotesSettingsManager>(); }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
 
         public Login()
         {
             InitializeComponent();
-
             InitializeDataContext();
-        }
-
-        private void InitializeDataContext()
-        {
-            this.DataContext = this;
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -51,17 +33,18 @@ namespace sticky_notes_wp8
             loginProgress.IsIndeterminate = true;
             loginButton.IsEnabled = false;
 
-            var onlineRepository = Locator.Instance<OnlineRepository>();
-            var response = await onlineRepository.UserLogin(this.username.Text, this.password.Password);
+            var response = await this.OnlineRepository.UserLogin(this.username.Text, this.password.Password);
 
             loginButton.IsEnabled = true;
             loginProgress.IsIndeterminate = false;
 
-            ShowMessageBasedOnResponseCode(response.code);
-
-            if (response.code == 200)
+            if (response.WasSuccessful())
             {
                 SaveUserTokenFromLoginResponse(response);
+            }
+            else
+            {
+                ShowMessageBasedOnResponseCode(response.code);
             }
         }
 
@@ -83,8 +66,6 @@ namespace sticky_notes_wp8
                 case 403:
                     MessageBox.Show("Invalid username or password.", "Incorrect Credentials", MessageBoxButton.OK);
                     break;
-                case 200:
-                    break;
                 default:
                     MessageBox.Show("An error occurred whilst logging in. Please try again.", "Login Error", MessageBoxButton.OK);
                     break;
@@ -93,7 +74,7 @@ namespace sticky_notes_wp8
 
         private void SaveUserTokenFromLoginResponse(OnlineRepository.RepositoryResponse<OnlineRepository.LoginResponse> response)
         {
-            Locator.Instance<StickyNotesSettingsManager>().SessionToken = response.data.session.id;
+            this.SettingsManager.SessionToken = response.data.session.id;
 
             if (redirectUri != null)
             {

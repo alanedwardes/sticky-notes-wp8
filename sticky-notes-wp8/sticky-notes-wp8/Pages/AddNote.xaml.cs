@@ -14,29 +14,18 @@ using sticky_notes_wp8.Services;
 
 namespace sticky_notes_wp8.Views
 {
-    public partial class AddNote : PhoneApplicationPage, INotifyPropertyChanged
+    using sticky_notes_wp8.Pages;
+
+    public partial class AddNote : BaseStickyNotesPage
     {
         private Note currentNote;
         public Note CurrentNote
         {
             get { return currentNote; }
-            set
-            {
-                if (currentNote != value)
-                {
-                    currentNote = value;
-                    NotifyPropertyChanged("CurrentNote");
-                }
-            }
+            set { currentNote = value; NotifyPropertyChanged("CurrentNote"); }
         }
 
         private Board currentBoard;
-
-        public StickyNotesSettingsManager SettingsManager
-        {
-            get { return Locator.Instance<StickyNotesSettingsManager>(); }
-        }
-
         public bool InEditMode;
 
         public AddNote()
@@ -45,29 +34,20 @@ namespace sticky_notes_wp8.Views
             InitializeDataContext();
         }
 
-        private void InitializeDataContext()
-        {
-            this.DataContext = this;
-        }
-
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
             // Call the base method.
             base.OnNavigatedFrom(e);
-
-            var localRepository = Locator.Instance<LocalRepository>();
-            localRepository.Commit();
+            this.LocalRepository.Commit();
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            var localRepository = Locator.Instance<LocalRepository>();
-
             base.OnNavigatedTo(e); 
             string noteId;
             if (NavigationContext.QueryString.TryGetValue("noteId", out noteId))
             {
-                this.CurrentNote = localRepository.GetNote().Where(n => n.LocalStorageId == int.Parse(noteId)).Single();
+                this.CurrentNote = this.LocalRepository.GetNote().Where(n => n.LocalStorageId == int.Parse(noteId)).Single();
                 this.PageTitle.Text = "edit note";
                 this.InEditMode = true;
             }
@@ -81,7 +61,7 @@ namespace sticky_notes_wp8.Views
             string boardId;
             if (NavigationContext.QueryString.TryGetValue("boardId", out boardId))
             {
-                this.currentBoard = localRepository.GetBoard().Where(b => b.LocalStorageId == int.Parse(boardId)).Single();
+                this.currentBoard = this.LocalRepository.GetBoard().Where(b => b.LocalStorageId == int.Parse(boardId)).Single();
             }
             else
             {
@@ -91,23 +71,19 @@ namespace sticky_notes_wp8.Views
 
         private void SaveNote_Click(object sender, RoutedEventArgs e)
         {
-            var localRepository = Locator.Instance<LocalRepository>();
-            var onlineRepository = Locator.Instance<OnlineRepository>();
-            var settingsManager = Locator.Instance<StickyNotesSettingsManager>();
-
             if (!string.IsNullOrWhiteSpace(NoteBody.Text))
             {
                 if (!this.InEditMode)
                 {
                     this.CurrentNote.Created = DateTime.Now;
-                    localRepository.StoreNote(currentNote);
+                    this.LocalRepository.StoreNote(currentNote);
                 }
 
-                localRepository.Commit();
+                this.LocalRepository.Commit();
 
                 if (this.currentBoard != null)
                 {
-                    onlineRepository.NotesSave(settingsManager.SessionToken, this.currentNote, this.currentBoard.Id);
+                    this.OnlineRepository.NotesSave(this.SettingsManager.SessionToken, this.currentNote, this.currentBoard.Id);
 
                     NavigationService.Navigate(new Uri(string.Format("/Pages/NoteList.xaml?boardId={0}", this.currentBoard.Id), UriKind.Relative));
                 }
@@ -115,15 +91,6 @@ namespace sticky_notes_wp8.Views
                 {
                     NavigationService.Navigate(new Uri("/Pages/NoteList.xaml", UriKind.Relative));
                 }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

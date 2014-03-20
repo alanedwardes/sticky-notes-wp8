@@ -65,6 +65,7 @@ namespace sticky_notes_wp8.Services
         public class RepositoryResponse<T>
         {
             public int code;
+            public bool WasSuccessful() { return (code >= 200 && code < 300); }
             public T data;
         }
 

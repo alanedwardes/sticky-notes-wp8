@@ -15,27 +15,16 @@ using Microsoft.Phone.Net.NetworkInformation;
 
 namespace sticky_notes_wp8
 {
-    public partial class BoardList : PhoneApplicationPage, INotifyPropertyChanged
+    using sticky_notes_wp8.Pages;
+
+    public partial class BoardList : BaseStickyNotesPage
     {
         private string sessionToken;
 
         public BoardList()
         {
             InitializeComponent();
-
             InitializeDataContext();
-
-            sessionToken = Locator.Instance<StickyNotesSettingsManager>().SessionToken;
-        }
-
-        private void InitializeDataContext()
-        {
-            this.DataContext = this;
-        }
-
-        public StickyNotesSettingsManager SettingsManager
-        {
-            get { return Locator.Instance<StickyNotesSettingsManager>(); }
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -44,28 +33,16 @@ namespace sticky_notes_wp8
             base.OnNavigatedTo(e);
         }
 
-        // Define an observable collection property that controls can bind to.
         private ObservableCollection<Board> boards;
         public ObservableCollection<Board> Boards
         {
-            get
-            {
-                return boards;
-            }
-            set
-            {
-                if (boards != value)
-                {
-                    boards = value;
-                    NotifyPropertyChanged("Boards");
-                }
-            }
+            get { return boards; }
+            set { boards = value; NotifyPropertyChanged("Boards"); }
         }
 
         private void RefreshBoards(string query = "")
         {
-            var localRepository = Locator.Instance<LocalRepository>();
-            var boards = localRepository.GetBoard();
+            var boards = this.LocalRepository.GetBoard();
 
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -74,15 +51,6 @@ namespace sticky_notes_wp8
 
             boards = boards.OrderBy(n => n.Name).ToList();
             Boards = new ObservableCollection<Board>(boards);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
         }
 
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
@@ -112,7 +80,7 @@ namespace sticky_notes_wp8
 
         private async void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sessionToken == null)
+            if (this.SettingsManager.SessionToken == null)
             {
                 NavigationService.Navigate(new Uri("/Pages/Login.xaml?redirectTo=/Pages/BoardList.xaml", UriKind.Relative));
             }
@@ -125,10 +93,8 @@ namespace sticky_notes_wp8
 
             LoadingProgress.IsIndeterminate = true;
 
-            var onlineRepository = Locator.Instance<OnlineRepository>();
-
-            var boardsResponse = await onlineRepository.BoardsList(sessionToken);
-            if (boardsResponse.code != 200)
+            var boardsResponse = await this.OnlineRepository.BoardsList(this.SettingsManager.SessionToken);
+            if (!boardsResponse.WasSuccessful())
             {
                 LoadingProgress.IsIndeterminate = false;
                 return;
@@ -140,22 +106,24 @@ namespace sticky_notes_wp8
                 return;
             }
 
-            var localRepository = Locator.Instance<LocalRepository>();
-            localRepository.ClearBoard();
-            localRepository.StoreBoard(boardsResponse.data.boards);
+            this.LocalRepository.ClearBoard();
+            this.LocalRepository.StoreBoard(boardsResponse.data.boards);
 
             foreach (var board in boardsResponse.data.boards)
             {
-                var notesResponse = await onlineRepository.NotesList(sessionToken, board.Id);
-                foreach (var note in notesResponse.data.notes)
+                var notesResponse = await this.OnlineRepository.NotesList(sessionToken, board.Id);
+                if (notesResponse.WasSuccessful())
                 {
-                    var notesToDelete = localRepository.GetNote().Where(n => n.BoardId == board.Id).ToList();
-                    localRepository.ClearNote(notesToDelete);
-                    localRepository.StoreNote(note);
+                    foreach (var note in notesResponse.data.notes)
+                    {
+                        var notesToDelete = this.LocalRepository.GetNote().Where(n => n.BoardId == board.Id).ToList();
+                        this.LocalRepository.ClearNote(notesToDelete);
+                        this.LocalRepository.StoreNote(note);
+                    }
                 }
             }
 
-            localRepository.Commit();
+            this.LocalRepository.Commit();
             this.RefreshBoards();
 
             LoadingProgress.IsIndeterminate = false;
